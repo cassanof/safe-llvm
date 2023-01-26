@@ -1,3 +1,11 @@
+# SafeLLVM
+TODO: full description
+
+## Project Location
+Most of our changes are located at `./llvm/lib/Target/X86/SafeLLVM`
+
+## Below is the README from the original LLVM project.
+
 # The LLVM Compiler Infrastructure
 
 This directory and its sub-directories contain the source code for LLVM,
