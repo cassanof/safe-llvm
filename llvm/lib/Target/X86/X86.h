@@ -129,6 +129,9 @@ FunctionPass *createX86DiscriminateMemOpsPass();
 /// This pass applies profiling information to insert cache prefetches.
 FunctionPass *createX86InsertPrefetchPass();
 
+/// This pass adds the return address hijacking protection.
+FunctionPass *createSafeReturnMachinePass();
+
 InstructionSelector *createX86InstructionSelector(const X86TargetMachine &TM,
                                                   X86Subtarget &,
                                                   X86RegisterBankInfo &);
