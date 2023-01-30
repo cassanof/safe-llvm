@@ -5,10 +5,13 @@
 #include "../X86InstrBuilder.h"
 #include "../X86TargetMachine.h"
 #include "Utils.cpp"
+#include "llvm/CodeGen/MachineBasicBlock.h"
+#include "llvm/CodeGen/MachineInstr.h"
 #include "llvm/CodeGen/MachineInstrBuilder.h"
 #include "llvm/CodeGen/MachineOperand.h"
 #include "llvm/InitializePasses.h"
 #include "llvm/Pass.h"
+#include <cstdio>
 
 llvm::FunctionPass *llvm::createSafeReturnMachinePass() {
   return new SafeReturnMachinePass();
@@ -30,40 +33,30 @@ bool SafeReturnMachinePass::runOnMachineFunction(llvm::MachineFunction &MF) {
   // print the name of the function
   llvm::errs() << "SafeReturnMachinePass: " << MF.getName() << "\n";
 
-  // auto funcs_start = MF.begin();
-  // skipEmptyMachineFunctions(funcs_start);
-  // auto first_instr = funcs_start->begin();
-  // // TODO: only insert entry encryption if you also insert ret decryption
+  // get the first basic block in the function
+  llvm::MachineBasicBlock &MBB = MF.front();
 
-  // // add entry encryption block
-  // llvm::MachineBasicBlock *entry_encryption_block =
-      // MF.CreateMachineBasicBlock();
-  // MF.insert(funcs_start, entry_encryption_block);
-  // entry_encryption_block->addSuccessor(first_instr->getParent());
-  // first_instr = entry_encryption_block->begin(); // set new first instr
+  // get the first instruction in the basic block
+  llvm::MachineBasicBlock::iterator I = MBB.begin();
 
-  // llvm::MachineOperand def_R11 =
-      // llvm::MachineOperand::CreateReg(llvm::X86::R11, true);
-  // llvm::MachineOperand ref_R11 =
-      // llvm::MachineOperand::CreateReg(llvm::X86::R11, false);
+  // TODO: replace 1337 with the stack canary value
 
-  // // mov    %fs:0x28,%r11
-  // llvm::MachineInstrBuilder entry_encryption =
-      // llvm::BuildMI(*entry_encryption_block, first_instr,
-                    // first_instr->getDebugLoc(), TII.get(llvm::X86::MOV64rm))
-          // .addReg(0)
-          // .addImm(1)
-          // .addReg(0)
-          // .addImm(0x28)
-          // .addReg(llvm::X86::FS);
-  // entry_encryption->addOperand(def_R11);
+  llvm::errs() << "SafeReturnMachinePass: inserted instructions: ";
+  // create the instruction
+  // mov    $1337,%r11
+  llvm::MachineInstrBuilder MIB = BuildMI(
+      MBB, I, llvm::DebugLoc(), TII.get(llvm::X86::MOV64ri), llvm::X86::R11);
+  MIB.addImm(1337);
+  MIB.getInstr()->print(llvm::errs());
 
-  // entry_encryption_block->addLiveIn(llvm::X86::R11);
-  // entry_encryption_block->sortUniqueLiveIns();
+  // create the instruction
+  // xor %r11, (%rsp)
+  MIB = BuildMI(MBB, I, llvm::DebugLoc(), TII.get(llvm::X86::XOR64mr));
+  llvm::addRegOffset(MIB, llvm::X86::RSP, false, 0);
+  MIB->addOperand(llvm::MachineOperand::CreateReg(llvm::X86::R11, false));
+  MIB.getInstr()->print(llvm::errs());
 
-  // // add ret decryption block
-
-  // auto funcs_end = MF.end();
+  llvm::errs() << "\n";
 
   return true;
 }
