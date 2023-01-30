@@ -30,12 +30,18 @@ void insertEncryptionInstrs(llvm::MachineBasicBlock &MBB,
 
   llvm::errs()
       << "--- SafeReturnMachinePass: inserted instructions START ---\n";
-  // TODO: replace 1337 with the stack canary value and abstract away
-  // create the instruction
-  // mov    $1337,%r11
-  llvm::MachineInstrBuilder MIB = BuildMI(
-      MBB, I, llvm::DebugLoc(), TII.get(llvm::X86::MOV64ri), llvm::X86::R11);
-  MIB.addImm(1337);
+  // moves the stack canary value to r11
+  // mov    %fs:0x28,%r11
+  llvm::MachineInstrBuilder MIB =
+      BuildMI(MBB, I, llvm::DebugLoc(), TII.get(llvm::X86::MOV64rm));
+  // hack to get the correct register
+  MIB->addOperand(llvm::MachineOperand::CreateReg(llvm::X86::R11, true));
+  MIB.addReg(0);
+  MIB.addImm(1);
+  MIB.addReg(0);
+  MIB.addImm(0x28);
+  MIB.addReg(llvm::X86::FS);
+
   MIB.getInstr()->print(llvm::errs());
 
   // create the instruction
