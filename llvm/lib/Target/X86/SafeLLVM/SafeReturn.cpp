@@ -1,10 +1,8 @@
-
-
 #include "SafeReturn.h"
 #include "../X86.h"
 #include "../X86InstrBuilder.h"
 #include "../X86TargetMachine.h"
-#include "Utils.cpp"
+#include "Utils.h"
 #include "llvm/CodeGen/MachineBasicBlock.h"
 #include "llvm/CodeGen/MachineFunction.h"
 #include "llvm/CodeGen/MachineInstr.h"
@@ -42,7 +40,8 @@ void insertEncryptionInstrs(llvm::MachineBasicBlock &MBB,
   MIB.addImm(0x28);
   MIB.addReg(llvm::X86::FS);
 
-  MIB.getInstr()->print(llvm::errs());
+  llvm::MachineInstr *FIRST = MIB.getInstr();
+  FIRST->print(llvm::errs());
 
   // create the instruction
   // xor %r11, (%rsp)
@@ -65,7 +64,7 @@ void insertEntryEncrypt(llvm::MachineFunction &MF, llvm::X86Subtarget &STI) {
   // get the first instruction in the basic block
   llvm::MachineBasicBlock::iterator I = MBB.begin();
 
-  return insertEncryptionInstrs(MBB, I, STI);
+  insertEncryptionInstrs(MBB, I, STI);
 }
 
 bool SafeReturnMachinePass::runOnMachineFunction(llvm::MachineFunction &MF) {
