@@ -1,10 +1,13 @@
-
-// Who cares about ODR?
+#include "llvm/CodeGen/LiveIntervals.h"
+#include "llvm/CodeGen/MachineFunction.h"
 
 /// Skips empty machine functions.
-#include "llvm/CodeGen/MachineFunction.h"
-void skipEmptyMachineFunctions(llvm::MachineFunction::iterator &funcs) {
-  while (funcs->empty()) {
-    ++funcs;
-  }
-}
+void skipEmptyMachineFunctions(llvm::MachineFunction::iterator &funcs);
+
+// produces a nop sled of 9 nop instructions.
+void insertNopSled(llvm::MachineInstr *MI);
+
+// splits the given machine basic block into two. TODO: document more
+llvm::MachineBasicBlock *splitAt(llvm::MachineBasicBlock *MBB,
+                                 llvm::MachineInstr &MI, bool UpdateLiveIns,
+                                 llvm::LiveIntervals *LIS);
