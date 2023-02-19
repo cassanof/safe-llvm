@@ -28,3 +28,13 @@ void insertNopSled(llvm::MachineInstr *MI) {
     MIBNop = BuildMI(*MBB, MI, DL, TII.get(llvm::X86::NOOP));
   }
 }
+
+bool isBranchInto(llvm::MachineInstr *MI, llvm::MachineFunction *MF) {
+  if (MI->isBranch()) {
+    llvm::MachineFunction *Branching = MI->getOperand(0).getMBB()->getParent();
+    if (Branching->getFunctionNumber() == MF->getFunctionNumber()) {
+      return true;
+    }
+  }
+  return false;
+}

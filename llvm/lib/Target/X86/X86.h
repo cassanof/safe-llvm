@@ -157,6 +157,9 @@ FunctionPass *createX86PartialReductionPass();
 /// This pass adds the return address hijacking protection.
 FunctionPass *createSafeReturnMachinePass();
 
+/// This pass adds the branch cookie to jmp/call instructions.
+FunctionPass *createBranchCookieMachinePass();
+
 InstructionSelector *createX86InstructionSelector(const X86TargetMachine &TM,
                                                   X86Subtarget &,
                                                   X86RegisterBankInfo &);
@@ -207,8 +210,8 @@ enum : unsigned {
   PTR32_UPTR = 271,
   PTR64 = 272
 };
-} // End X86AS namespace
+} // namespace X86AS
 
-} // End llvm namespace
+} // namespace llvm
 
 #endif
