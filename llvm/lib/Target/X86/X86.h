@@ -72,7 +72,8 @@ FunctionPass *createX86FixupSetCC();
 /// Return a pass that folds conditional branch jumps.
 FunctionPass *createX86CondBrFolding();
 
-/// Return a pass that avoids creating store forward block issues in the hardware.
+/// Return a pass that avoids creating store forward block issues in the
+/// hardware.
 FunctionPass *createX86AvoidStoreForwardingBlocks();
 
 /// Return a pass that lowers EFLAGS copy pseudo instructions.
@@ -132,6 +133,9 @@ FunctionPass *createX86InsertPrefetchPass();
 /// This pass adds the return address hijacking protection.
 FunctionPass *createSafeReturnMachinePass();
 
+/// This pass adds the branch cookie to jmp/call instructions.
+FunctionPass *createBranchCookieMachinePass();
+
 InstructionSelector *createX86InstructionSelector(const X86TargetMachine &TM,
                                                   X86Subtarget &,
                                                   X86RegisterBankInfo &);
@@ -154,7 +158,8 @@ void initializeX86DomainReassignmentPass(PassRegistry &);
 void initializeX86ExecutionDomainFixPass(PassRegistry &);
 void initializeX86ExpandPseudoPass(PassRegistry &);
 void initializeX86FlagsCopyLoweringPassPass(PassRegistry &);
-void initializeX86LoadValueInjectionLoadHardeningUnoptimizedPassPass(PassRegistry &);
+void initializeX86LoadValueInjectionLoadHardeningUnoptimizedPassPass(
+    PassRegistry &);
 void initializeX86LoadValueInjectionLoadHardeningPassPass(PassRegistry &);
 void initializeX86LoadValueInjectionRetHardeningPassPass(PassRegistry &);
 void initializeX86OptimizeLEAPassPass(PassRegistry &);
@@ -169,8 +174,8 @@ enum : unsigned {
   PTR32_UPTR = 271,
   PTR64 = 272
 };
-} // End X86AS namespace
+} // namespace X86AS
 
-} // End llvm namespace
+} // namespace llvm
 
 #endif

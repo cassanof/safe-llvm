@@ -1,7 +1,7 @@
 #include "llvm/CodeGen/LiveIntervals.h"
 #include "llvm/CodeGen/MachineFunction.h"
 
-/// Skips empty machine functions.
+// Skips empty machine functions.
 void skipEmptyMachineFunctions(llvm::MachineFunction::iterator &funcs);
 
 // produces a nop sled of 9 nop instructions.
@@ -11,3 +11,7 @@ void insertNopSled(llvm::MachineInstr *MI);
 llvm::MachineBasicBlock *splitAt(llvm::MachineBasicBlock *MBB,
                                  llvm::MachineInstr &MI, bool UpdateLiveIns,
                                  llvm::LiveIntervals *LIS);
+
+// returns true if the given instruction is a branch instruction that
+// branches into the given machine function.
+bool isBranchInto(llvm::MachineInstr *MI, llvm::MachineFunction *MF);
