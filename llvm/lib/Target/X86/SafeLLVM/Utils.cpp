@@ -31,7 +31,11 @@ void insertNopSled(llvm::MachineInstr *MI) {
 
 bool isBranchInto(llvm::MachineInstr *MI, llvm::MachineFunction *MF) {
   if (MI->isBranch()) {
-    llvm::MachineFunction *Branching = MI->getOperand(0).getMBB()->getParent();
+    llvm::MachineOperand MO = MI->getOperand(0);
+    if (!MO.isMBB()) {
+      return false;
+    }
+    llvm::MachineFunction *Branching = MO.getMBB()->getParent();
     if (Branching->getFunctionNumber() == MF->getFunctionNumber()) {
       return true;
     }

@@ -89,7 +89,9 @@ bool SafeReturnMachinePass::runOnMachineFunction(llvm::MachineFunction &MF) {
     llvm::MachineBasicBlock::iterator IEnd = MBB->end();
 
     for (; I != IEnd; ++I) {
-      if (I->isReturn() || isBranchInto(&*I, &MF)) {
+      if (I->isReturn() 
+          // || isBranchInto(&*I, &MF)
+          ) {
         hadRet = true;
         printf("SafeReturnMachinePass: found ret\n");
         insertEncryptionInstrs(*MBB, I, const_cast<llvm::X86Subtarget &>(STI));

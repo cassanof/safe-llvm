@@ -12,6 +12,7 @@
 
 #include "X86TargetMachine.h"
 #include "MCTargetDesc/X86MCTargetDesc.h"
+#include "SafeLLVM/SafeReturn.h"
 #include "TargetInfo/X86TargetInfo.h"
 #include "X86.h"
 #include "X86CallLowering.h"
@@ -21,7 +22,6 @@
 #include "X86Subtarget.h"
 #include "X86TargetObjectFile.h"
 #include "X86TargetTransformInfo.h"
-#include "SafeLLVM/SafeReturn.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallString.h"
 #include "llvm/ADT/StringRef.h"
