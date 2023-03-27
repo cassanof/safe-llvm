@@ -157,6 +157,11 @@ FunctionPass *createX86PartialReductionPass();
 /// This pass adds the return address hijacking protection.
 FunctionPass *createSafeReturnMachinePass();
 
+/// This pass changes all immediate operands that encode a free-branch instruction
+/// semantically equivalent immediate operands that don't encode a free-branch 
+/// instruction.
+FunctionPass *createImmedateReencodingPass();
+
 /// This pass adds the branch cookie to jmp/call instructions.
 FunctionPass *createBranchCookieMachinePass();
 

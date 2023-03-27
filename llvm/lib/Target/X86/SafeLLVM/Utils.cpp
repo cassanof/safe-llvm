@@ -42,3 +42,15 @@ bool isBranchInto(llvm::MachineInstr *MI, llvm::MachineFunction *MF) {
   }
   return false;
 }
+
+bool encodesFreeBranch(uint8_t byte) {
+  switch (byte) {
+  case 0xc3: // ret
+  case 0xc2: // ret imm16
+  case 0xcb: // retf
+  case 0xca: // retf imm16
+    return true;
+  }
+
+  return false;
+}
