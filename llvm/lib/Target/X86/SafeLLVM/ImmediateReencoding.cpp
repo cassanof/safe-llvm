@@ -2,6 +2,7 @@
 #include "../X86.h"
 #include "../X86InstrBuilder.h"
 #include "../X86TargetMachine.h"
+#include "MCTargetDesc/X86MCTargetDesc.h"
 #include "Utils.h"
 #include "llvm/CodeGen/MachineBasicBlock.h"
 #include "llvm/CodeGen/MachineFunction.h"
@@ -22,6 +23,18 @@ char ImmediateReencodingMachinePass::ID = 0;
 static llvm::RegisterPass<ImmediateReencodingMachinePass>
     X("immreencode", "Immediate Reencoding Pass");
 
+bool isAddRI(llvm::MachineInstr &MI) {
+  switch (MI.getOpcode()) {
+  case llvm::X86::ADD32ri:
+  case llvm::X86::ADD32ri8:
+  case llvm::X86::ADD64ri32:
+  case llvm::X86::ADD64ri8:
+    return true;
+  default:
+    return false;
+  }
+}
+
 bool ImmediateReencodingMachinePass::runOnMachineFunction(
     llvm::MachineFunction &MF) {
   // quit immediately if it's empty
@@ -30,6 +43,8 @@ bool ImmediateReencodingMachinePass::runOnMachineFunction(
 
   llvm::MachineFunction::iterator MBB = MF.begin();
   llvm::MachineFunction::iterator MBBEnd = MF.end();
+  const llvm::X86Subtarget &STI = MF.getSubtarget<llvm::X86Subtarget>();
+  const llvm::X86InstrInfo &TII = *STI.getInstrInfo();
 
   for (; MBB != MBBEnd; ++MBB) {
     llvm::MachineBasicBlock::iterator I = MBB->begin();
@@ -49,7 +64,55 @@ bool ImmediateReencodingMachinePass::runOnMachineFunction(
           continue;
 
         llvm::errs() << "Found free-branch immediate at " << i << ": "
-                     << llvm::format("0x%lx", imm) << "!\n";
+                     << llvm::format("0x%lx", imm) << " (ins: " << kind
+                     << ")!\n";
+
+        // divide the imm into two.
+        // TODO: come up with a more mathematically sound way to do this.
+        // in essence, we want to split the immediate into two parts that
+        // will **NOT** encode a free branch.
+        int64_t imm1 = imm / 2;
+        int64_t imm2 = imm - imm1;
+
+        // BIG TODO: handle more instrs, this is just for ADDxxrixx testing
+        if (!isAddRI(MI))
+          continue;
+
+        // TODO: delete prints
+        // print MBB before insertion
+        MBB->print(llvm::errs(), nullptr);
+
+        llvm::MachineInstrBuilder MIBB;
+        llvm::DebugLoc DL = MI.getDebugLoc();
+
+        // TODO: OMG I forgot about flags. We need to save and restore them
+        // before and after the reencoding. T_T
+        // also push R12.
+
+        // we add up the two immediate values and store the result in R12
+        // code:
+        // mov $imm1, %r12
+        // add $imm2, %r12
+        MIBB = llvm::BuildMI(*MBB, I, DL, TII.get(llvm::X86::MOV64ri));
+        MIBB.addReg(llvm::X86::R12);
+        MIBB.addImm(imm1);
+        MIBB = llvm::BuildMI(*MBB, I, DL, TII.get(llvm::X86::ADD64ri32),
+                             llvm::X86::R12);
+        MIBB.addReg(llvm::X86::R12);
+        MIBB.addImm(imm2);
+
+        // now, we change MO's value to R12
+        MO.ChangeToRegister(llvm::X86::R12, false);
+        // change MI's instruction to be a register operand
+
+        // BIG TODO: we gotta generalize tis to many insts....
+        MI.setDesc(TII.get(llvm::X86::ADD64rr));
+
+        // add R12 to live registers
+        MBB->addLiveIn(llvm::X86::R12);
+
+        // print MBB after insertion
+        MBB->print(llvm::errs(), nullptr);
       }
     }
   }

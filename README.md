@@ -1,5 +1,8 @@
 # SafeLLVM
-TODO: full description
+SafeLLVM provides a x86_64 backend for LLVM 16 that eliminates most if not all 
+usable ROP gadgets in the generated code.
+It achieves this by using a combination of runtime control-flow integrity and
+instruction rewriting.
 
 ## Project Location
 Most of our changes are located at `./llvm/lib/Target/X86/SafeLLVM`

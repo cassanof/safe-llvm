@@ -49,6 +49,7 @@ bool encodesFreeBranch(uint8_t byte) {
   case 0xc2: // ret imm16
   case 0xcb: // retf
   case 0xca: // retf imm16
+  case 0xcf: // iret
     return true;
   }
 
