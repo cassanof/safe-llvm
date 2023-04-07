@@ -13,8 +13,13 @@ void insertNopSled(llvm::MachineInstr *MI);
 // branches into the given machine function.
 bool isBranchInto(llvm::MachineInstr *MI, llvm::MachineFunction *MF);
 
-// returns true if the given byte encodes a free-branch instruction.
-bool encodesFreeBranch(uint8_t byte);
+// returns true if the given qword could encode a free branch instruction.
+bool encodesFreeBranch(uint64_t qword);
+
+// splits a qword that encodes a free branch instruction into two qwords
+// that do not encode a free branch instruction. May return an empty
+// optional if the greedy algorithm fails to find a split.
+std::optional<std::pair<uint64_t, uint64_t>> splitIntoNonFreeBranch(uint64_t qword);
 
 // produces an instruction that pushes the eflags register onto the stack.
 // the given register is used for saving the eflags register.

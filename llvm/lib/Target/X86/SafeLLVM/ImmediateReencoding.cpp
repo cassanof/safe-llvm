@@ -61,7 +61,7 @@ bool ImmediateReencodingMachinePass::runOnMachineFunction(
           continue;
 
         int64_t imm = MO.getImm();
-        if (!encodesFreeBranch(imm & 0xff))
+        if (!encodesFreeBranch(imm))
           continue;
 
         llvm::errs() << "Found free-branch immediate at " << i << ": "
@@ -69,11 +69,15 @@ bool ImmediateReencodingMachinePass::runOnMachineFunction(
                      << ")!\n";
 
         // divide the imm into two.
-        // TODO: come up with a more mathematically sound way to do this.
-        // in essence, we want to split the immediate into two parts that
-        // will **NOT** encode a free branch.
-        int64_t imm1 = imm / 2;
-        int64_t imm2 = imm - imm1;
+        std::optional<std::pair<uint64_t, uint64_t>> maybeSplit =
+            splitIntoNonFreeBranch(imm);
+        if (!maybeSplit.has_value()) {
+          llvm::errs() << "Could not split the immediate into two "
+                          "non-free-branch immediates! WOW!\n";
+          continue;
+        }
+        int64_t imm1 = maybeSplit.value().first;
+        int64_t imm2 = maybeSplit.value().second;
 
         // BIG TODO: handle more instrs, this is just for ADDxxrixx testing
         if (!isAddRI(MI))
