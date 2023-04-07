@@ -3,7 +3,7 @@
 version = 3
 
 [[package]]
-name = "bad_byte"
+name = "bad_byte_fuzz"
 version = "0.1.0"
 dependencies = [
  "rand",
