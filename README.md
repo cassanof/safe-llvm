@@ -5,7 +5,7 @@ usable ROP gadgets in the generated code.
 It achieves this by using a combination of runtime control-flow integrity and
 instruction rewriting.
 
-In principle, this is a modern implementation of [GFree](https://www.onarlioglu.com/publications/acsac2010rop.pdf).
+In principle, this is a modern implementation of [G-Free](https://www.onarlioglu.com/publications/acsac2010rop.pdf).
 
 ## Project Location
 
