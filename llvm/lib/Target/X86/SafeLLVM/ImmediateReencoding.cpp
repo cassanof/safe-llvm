@@ -14,6 +14,7 @@
 #include "llvm/Pass.h"
 #include <cstdint>
 #include <cstdio>
+#include <optional>
 
 llvm::FunctionPass *llvm::createImmedateReencodingPass() {
   return new ImmediateReencodingMachinePass();
@@ -24,15 +25,17 @@ char ImmediateReencodingMachinePass::ID = 0;
 static llvm::RegisterPass<ImmediateReencodingMachinePass>
     X("immreencode", "Immediate Reencoding Pass");
 
-bool isAddRI(llvm::MachineInstr &MI) {
+// BIG TODO: handle more instrs, this is just for ADDxxrixx testing
+std::optional<const unsigned int>
+getRegisterEquivalentOpcode(llvm::MachineInstr &MI) {
   switch (MI.getOpcode()) {
   case llvm::X86::ADD32ri:
   case llvm::X86::ADD32ri8:
   case llvm::X86::ADD64ri32:
   case llvm::X86::ADD64ri8:
-    return true;
+    return llvm::X86::ADD64rr;
   default:
-    return false;
+    return std::nullopt;
   }
 }
 
@@ -79,9 +82,15 @@ bool ImmediateReencodingMachinePass::runOnMachineFunction(
         int64_t imm1 = maybeSplit.value().first;
         int64_t imm2 = maybeSplit.value().second;
 
-        // BIG TODO: handle more instrs, this is just for ADDxxrixx testing
-        if (!isAddRI(MI))
+        std::optional<const unsigned int> maybeOpcode =
+            getRegisterEquivalentOpcode(MI);
+        if (!maybeOpcode.has_value()) {
+          llvm::errs() << "Could not find a register-equivalent opcode for "
+                          "instruction "
+                       << kind << "!\n";
           continue;
+        }
+        unsigned int NewOpcode = maybeOpcode.value();
 
         // TODO: delete prints
         // print MBB before insertion
@@ -123,7 +132,7 @@ bool ImmediateReencodingMachinePass::runOnMachineFunction(
         // change MI's instruction to be a register operand
 
         // BIG TODO: we gotta generalize tis to many insts....
-        MI.setDesc(TII.get(llvm::X86::ADD64rr));
+        MI.setDesc(TII.get(NewOpcode));
 
         // add R12 to live registers
         MBB->addLiveIn(llvm::X86::R12);
