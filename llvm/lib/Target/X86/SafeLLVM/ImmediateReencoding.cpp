@@ -9,6 +9,7 @@
 #include "llvm/CodeGen/MachineInstr.h"
 #include "llvm/CodeGen/MachineInstrBuilder.h"
 #include "llvm/CodeGen/MachineOperand.h"
+#include "llvm/CodeGen/Register.h"
 #include "llvm/InitializePasses.h"
 #include "llvm/Pass.h"
 #include <cstdint>
@@ -85,14 +86,20 @@ bool ImmediateReencodingMachinePass::runOnMachineFunction(
         llvm::MachineInstrBuilder MIBB;
         llvm::DebugLoc DL = MI.getDebugLoc();
 
-        // TODO: OMG I forgot about flags. We need to save and restore them
-        // before and after the reencoding. T_T
-        // also push R12.
-
         // we add up the two immediate values and store the result in R12
         // code:
+        // push %r12
+        // push %eflags # because ADD changes the CF and OF flags
         // mov $imm1, %r12
         // add $imm2, %r12
+        // pop %eflags
+        // [the imm we are patching] ?? %r12 ??
+        // pop %r12
+        llvm::Register SaveEFLAGS =
+            MF.getRegInfo().createVirtualRegister(&llvm::X86::GR64RegClass);
+        MIBB = llvm::BuildMI(*MBB, I, DL, TII.get(llvm::X86::PUSH64r));
+        MIBB.addReg(llvm::X86::R12);
+        pushEFLAGS(I, SaveEFLAGS);
         MIBB = llvm::BuildMI(*MBB, I, DL, TII.get(llvm::X86::MOV64ri));
         MIBB.addReg(llvm::X86::R12);
         MIBB.addImm(imm1);
@@ -100,6 +107,12 @@ bool ImmediateReencodingMachinePass::runOnMachineFunction(
                              llvm::X86::R12);
         MIBB.addReg(llvm::X86::R12);
         MIBB.addImm(imm2);
+        popEFLAGS(I, SaveEFLAGS);
+
+        llvm::MachineBasicBlock::iterator IAfterIMM = I;
+        IAfterIMM++;
+        MIBB = llvm::BuildMI(*MBB, IAfterIMM, DL, TII.get(llvm::X86::POP64r));
+        MIBB.addReg(llvm::X86::R12);
 
         // now, we change MO's value to R12
         MO.ChangeToRegister(llvm::X86::R12, false);

@@ -10,7 +10,6 @@
 #include "llvm/CodeGen/MachineOperand.h"
 #include "llvm/InitializePasses.h"
 #include "llvm/Pass.h"
-#include <cstdio>
 
 llvm::FunctionPass *llvm::createSafeReturnMachinePass() {
   return new SafeReturnMachinePass();
@@ -83,17 +82,17 @@ bool SafeReturnMachinePass::runOnMachineFunction(llvm::MachineFunction &MF) {
   llvm::MachineFunction::iterator MBBEnd = MF.end();
   bool hadRet = false;
 
-  // TODO: worry about branching
   for (; MBB != MBBEnd; ++MBB) {
     llvm::MachineBasicBlock::iterator I = MBB->begin();
     llvm::MachineBasicBlock::iterator IEnd = MBB->end();
 
     for (; I != IEnd; ++I) {
       if (I->isReturn() 
+          // TODO: fix this one day
           // || isBranchInto(&*I, &MF)
           ) {
         hadRet = true;
-        printf("SafeReturnMachinePass: found ret\n");
+        llvm::errs() << "SafeReturnMachinePass: found ret\n";
         insertEncryptionInstrs(*MBB, I, const_cast<llvm::X86Subtarget &>(STI));
       }
     }
