@@ -25,15 +25,37 @@ char ImmediateReencodingMachinePass::ID = 0;
 static llvm::RegisterPass<ImmediateReencodingMachinePass>
     X("immreencode", "Immediate Reencoding Pass");
 
-// BIG TODO: handle more instrs, this is just for ADDxxrixx testing
 std::optional<const unsigned int>
 getRegisterEquivalentOpcode(llvm::MachineInstr &MI) {
   switch (MI.getOpcode()) {
+  // ------------------ ADD ------------------
+  case llvm::X86::ADD8ri:
+  case llvm::X86::ADD8ri8:
+    return llvm::X86::ADD8rr;
+  case llvm::X86::ADD16ri:
+  case llvm::X86::ADD16ri8:
+    return llvm::X86::ADD16rr;
   case llvm::X86::ADD32ri:
   case llvm::X86::ADD32ri8:
+    return llvm::X86::ADD32rr;
   case llvm::X86::ADD64ri32:
   case llvm::X86::ADD64ri8:
     return llvm::X86::ADD64rr;
+  // ------------------ SUB ------------------
+  // TODO: SUB is not implemented yet
+  // ------------------ AND ------------------
+  // TODO: AND is not implemented yet
+  // ------------------ OR ------------------
+  // TODO: OR is not implemented yet
+  // ------------------ XOR ------------------
+  // TODO: XOR is not implemented yet
+  // ------------------ CMP ------------------
+  // TODO: CMP is not implemented yet
+  // ------------------ TEST ------------------
+  // TODO: TEST is not implemented yet
+  // ------------------ MOV ------------------
+  // TODO: MOV is not implemented yet
+  // ---------------- DEFAULT ----------------
   default:
     return std::nullopt;
   }
