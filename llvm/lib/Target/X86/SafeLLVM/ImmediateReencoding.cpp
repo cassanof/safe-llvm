@@ -193,6 +193,16 @@ bool ImmediateReencodingMachinePass::runOnMachineFunction(
                      << ": " << llvm::format("0x%lx", Imm)
                      << " (ins: " << KindStr << ")!\n";
 
+        std::optional<const unsigned int> MaybeOpcode =
+            getRegisterEquivalentOpcode(MI);
+        if (!MaybeOpcode.has_value()) {
+          llvm::errs() << "Could not find a register-equivalent opcode for "
+                          "instruction "
+                       << KindStr << "!\n";
+          continue;
+        }
+        unsigned int NewOpcode = MaybeOpcode.value();
+
         // divide the imm into two.
         std::optional<std::pair<uint64_t, uint64_t>> MaybeSplit =
             splitIntoNonFreeBranch(Imm);
@@ -204,16 +214,6 @@ bool ImmediateReencodingMachinePass::runOnMachineFunction(
         }
         int64_t Imm1 = MaybeSplit.value().first;
         int64_t Imm2 = MaybeSplit.value().second;
-
-        std::optional<const unsigned int> MaybeOpcode =
-            getRegisterEquivalentOpcode(MI);
-        if (!MaybeOpcode.has_value()) {
-          llvm::errs() << "Could not find a register-equivalent opcode for "
-                          "instruction "
-                       << KindStr << "!\n";
-          continue;
-        }
-        unsigned int NewOpcode = MaybeOpcode.value();
 
         // TODO: delete prints
         // print MBB before insertion
