@@ -15,5 +15,7 @@ int random(int _garbage) {
 int main(int argc, char *argv[])
 {
   random(0xdeadbeef);
+  printf("expected:\n");
+  printf("x = -559038543. y = -559033935. z = -557809390. a = -558989038. garbage = -559038737\n");
   return 0;
 }
