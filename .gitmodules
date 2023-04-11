@@ -1,3 +1,6 @@
 [submodule "examples/musl"]
 	path = examples/musl
 	url = git://git.musl-libc.org/musl
+[submodule "examples/doom/chocolate-doom"]
+	path = examples/doom/chocolate-doom
+	url = https://github.com/chocolate-doom/chocolate-doom
