@@ -168,6 +168,10 @@ bool ImmediateReencodingMachinePass::runOnMachineFunction(
   // this is a list of registers that encode free branches.
   // we don't want the register allocator to use them when
   // resolving virtual registers.
+  // example:
+  // mov r10, 0x1 ---> 49 c7 c3 01
+  //                         ^^
+  //                         this is r11, it encodes `ret`
   std::vector<llvm::Register> EncodesFreeBranches = {llvm::X86::R10,
                                                      llvm::X86::R11};
 
