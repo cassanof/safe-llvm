@@ -169,3 +169,16 @@ void popEFLAGS(llvm::MachineBasicBlock::iterator &I, llvm::Register R) {
              .addReg(llvm::X86::RSP, llvm::RegState::ImplicitKill)
              .addReg(llvm::X86::EFLAGS, llvm::RegState::ImplicitDefine);
 }
+
+unsigned int getImmediateSize(uint64_t Immediate) {
+  if (Immediate <= 0xFF) {
+    return 8;
+  }
+  if (Immediate <= 0xFFFF) {
+    return 16;
+  }
+  if (Immediate <= 0xFFFFFFFF) {
+    return 32;
+  }
+  return 64;
+}

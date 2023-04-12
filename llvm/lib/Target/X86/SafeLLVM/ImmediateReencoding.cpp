@@ -216,12 +216,9 @@ bool ImmediateReencodingMachinePass::runOnMachineFunction(
                           "non-free-branch immediates! WOW!\n";
           continue;
         }
+
         int64_t Imm1 = MaybeSplit.value().first;
         int64_t Imm2 = MaybeSplit.value().second;
-
-        // TODO: delete prints
-        // print MBB before insertion
-        MBB->print(llvm::errs(), nullptr);
 
         llvm::MachineInstrBuilder MIBB;
         llvm::DebugLoc DL = MI.getDebugLoc();
@@ -274,23 +271,12 @@ bool ImmediateReencodingMachinePass::runOnMachineFunction(
         // change MI's instruction to be a register operand
         MI.setDesc(TII.get(NewOpcode));
 
-        std::vector<llvm::Register> LiveInsToBeAdded;
-        LiveInsToBeAdded.push_back(TempReg1);
-        LiveInsToBeAdded.push_back(TempReg2);
-        // add all registers that encode free branches to the list of live
-        // registers
-        LiveInsToBeAdded.insert(LiveInsToBeAdded.end(),
-                                EncodesFreeBranches.begin(),
-                                EncodesFreeBranches.end());
-
-        for (auto Reg : LiveInsToBeAdded) {
+        // adding live-ins of bad registers to the MBB
+        for (auto Reg : EncodesFreeBranches) {
           if (!MBB->isLiveIn(Reg)) {
             MBB->addLiveIn(Reg);
           }
         }
-
-        // print MBB after insertion
-        MBB->print(llvm::errs(), nullptr);
       }
     }
   }

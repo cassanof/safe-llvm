@@ -11,6 +11,35 @@ In principle, this is a modern implementation of [G-Free](https://www.onarlioglu
 
 Most of our changes are located at `./llvm/lib/Target/X86/SafeLLVM`
 
+## Compiling
+
+To build and install SafeLLVM, you can simply run the following script:
+
+```bash
+./scripts/build_clangonly.sh <num_cores> ["Debug"|"Release"]
+```
+
+This will build and install a version of clang that uses SafeLLVM as its backend.
+You can choose to build the compiler in either Debug or Release mode.
+
+## Examples
+
+A series of various example programs can be found in `./examples`.
+These examples include small snippets of code that need to be transformed,
+vulnerable programs that are used to test the effectiveness of the compiler,
+and a few big programs (including Doom!) that are used as integration tests
+for the compiler.
+
+## Checking Gadget Removal
+
+There is a script that uses `ropper` to check the number of gadgets in the
+binary. We filter out some of the gadgets created by the CFI mechanism, as
+those are essentially false positives (they are not usable).
+
+```bash
+./scripts/num_gadgets.sh <path_to_binary>
+```
+
 ## Below is the README from the original LLVM project.
 
 # The LLVM Compiler Infrastructure

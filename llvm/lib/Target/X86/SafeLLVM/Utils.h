@@ -28,3 +28,8 @@ void pushEFLAGS(llvm::MachineBasicBlock::iterator &I, llvm::Register R);
 // produces an instruction that pops the eflags register from the stack.
 // the given register is used for saving the eflags register.
 void popEFLAGS(llvm::MachineBasicBlock::iterator &I, llvm::Register R);
+
+// produces the rounded-up size of the given immediate.
+// can only be 8, 16, 32 or 64.
+unsigned int getImmediateSize(uint64_t Immediate);
+
