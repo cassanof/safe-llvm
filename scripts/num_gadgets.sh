@@ -12,18 +12,47 @@ RET_ENCR_LEAVE="xor qword ptr [rsp], r11; ret;"
 
 OUR_GADGETS="$RET_ENCR_LEAVE"
 
-UNFILTERED=$(ropper --nocolor --file $1 | grep "0x")
-UNFILTERED_COUNT=$(echo "$UNFILTERED" | wc -l)
-FILTERED_COUNT=0
+UNFILTERED_ROP=$(ropper --nocolor --file $1 --type rop | grep "0x")
+UNFILTERED_COUNT_ROP=$(echo "$UNFILTERED_ROP" | wc -l)
+FILTERED_COUNT_ROP=0
 while read -r line; do
   while read -r gadget; do
     if [[ "$line" == *"$gadget"* ]]; then
-      ((FILTERED_COUNT++))
+      ((FILTERED_COUNT_ROP++))
+      break
+    fi
+    # filter out gadgets that are just rets, ropper includes a lot of these...
+    # here we use sed for this, but we could also use grep
+    # these are really only useful if used in conjunction with JOP gadgets
+    SED_RETHEX=$(echo "$line" | sed -n \
+      's/0x[0-9a-fA-F]*: ret 0x[0-9a-fA-F]*;/ret;/p' \
+    )
+    # if they are not empty, then we have a ret gadget
+    if [[ ! -z "$SED_RETHEX" ]]; then
+      ((FILTERED_COUNT_ROP++))
       break
     fi
   done <<< "$OUR_GADGETS"
-done <<< "$UNFILTERED"
+done <<< "$UNFILTERED_ROP"
 
-echo "Unfiltered count: $UNFILTERED_COUNT"
-echo "Filtered count: $FILTERED_COUNT"
-echo "Number of \"useful\" gadgets: $((UNFILTERED_COUNT-FILTERED_COUNT))"
+echo "######## ROP GADGETS ########"
+echo "Unfiltered count: $UNFILTERED_COUNT_ROP"
+echo "Filtered count: $FILTERED_COUNT_ROP"
+echo "Number of \"useful\" gadgets: $((UNFILTERED_COUNT_ROP-FILTERED_COUNT_ROP))"
+
+UNFILTERED_JOP=$(ropper --nocolor --file $1 --type jop | grep "0x")
+UNFILTERED_COUNT_JOP=$(echo "$UNFILTERED_JOP" | wc -l)
+FILTERED_COUNT_JOP=0
+while read -r line; do
+  while read -r gadget; do
+    if [[ "$line" == *"$gadget"* ]]; then
+      ((FILTERED_COUNT_JOP++))
+      break
+    fi
+  done <<< "$OUR_GADGETS"
+done <<< "$UNFILTERED_JOP"
+
+echo "######## JOP GADGETS ########"
+echo "Unfiltered count: $UNFILTERED_COUNT_JOP"
+echo "Filtered count: $FILTERED_COUNT_JOP"
+echo "Number of \"useful\" gadgets: $((UNFILTERED_COUNT_JOP-FILTERED_COUNT_JOP))"
