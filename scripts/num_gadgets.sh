@@ -12,15 +12,19 @@ RET_ENCR_LEAVE="xor qword ptr [rsp], r11; ret;"
 
 OUR_GADGETS="$RET_ENCR_LEAVE"
 
+PID=$$
+
 UNFILTERED_ROP=$(ropper --nocolor --file $1 --type rop | grep "0x")
 UNFILTERED_COUNT_ROP=$(echo "$UNFILTERED_ROP" | wc -l)
 FILTERED_COUNT_ROP=0
 while read -r line; do
+  USEFUL=1
   while read -r gadget; do
     if [[ "$line" == *"$gadget"* ]]; then
-      ((FILTERED_COUNT_ROP++))
+      USEFUL=0
       break
     fi
+
     # filter out gadgets that are just rets, ropper includes a lot of these...
     # here we use sed for this, but we could also use grep
     # these are really only useful if used in conjunction with JOP gadgets
@@ -29,13 +33,20 @@ while read -r line; do
     )
     # if they are not empty, then we have a ret gadget
     if [[ ! -z "$SED_RETHEX" ]]; then
-      ((FILTERED_COUNT_ROP++))
+      USEFUL=0
       break
     fi
   done <<< "$OUR_GADGETS"
+
+  if [[ $USEFUL -eq 1 ]]; then
+    echo "$line" >> "/tmp/rop_useful_gadgets_$PID.txt"
+  else
+    ((FILTERED_COUNT_ROP++))
+  fi
 done <<< "$UNFILTERED_ROP"
 
 echo "######## ROP GADGETS ########"
+echo "Dumped useful gadgets to /tmp/rop_useful_gadgets_$PID.txt"
 echo "Unfiltered count: $UNFILTERED_COUNT_ROP"
 echo "Filtered count: $FILTERED_COUNT_ROP"
 echo "Number of \"useful\" gadgets: $((UNFILTERED_COUNT_ROP-FILTERED_COUNT_ROP))"
@@ -44,15 +55,23 @@ UNFILTERED_JOP=$(ropper --nocolor --file $1 --type jop | grep "0x")
 UNFILTERED_COUNT_JOP=$(echo "$UNFILTERED_JOP" | wc -l)
 FILTERED_COUNT_JOP=0
 while read -r line; do
+  USEFUL=1
   while read -r gadget; do
     if [[ "$line" == *"$gadget"* ]]; then
-      ((FILTERED_COUNT_JOP++))
+      USEFUL=0
       break
     fi
   done <<< "$OUR_GADGETS"
+
+  if [[ $USEFUL -eq 1 ]]; then
+    echo "$line" >> "/tmp/jop_useful_gadgets_$PID.txt"
+  else
+    ((FILTERED_COUNT_ROP++))
+  fi
 done <<< "$UNFILTERED_JOP"
 
 echo "######## JOP GADGETS ########"
+echo "Dumped useful gadgets to /tmp/jop_useful_gadgets_$PID.txt"
 echo "Unfiltered count: $UNFILTERED_COUNT_JOP"
 echo "Filtered count: $FILTERED_COUNT_JOP"
 echo "Number of \"useful\" gadgets: $((UNFILTERED_COUNT_JOP-FILTERED_COUNT_JOP))"
