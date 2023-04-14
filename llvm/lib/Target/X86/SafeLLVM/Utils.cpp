@@ -25,7 +25,14 @@ void insertNopSled(llvm::MachineInstr *MI) {
   // now, we need to create the sled
   llvm::MachineInstrBuilder MIBNop;
 
-  for (int i = 0; i < 9; i++) {
+  // why 16:
+  // the maximum number of bytes in a single instruction is 15 in
+  // x86-64. Then, we have one possible ModR/M byte, SIB byte, or
+  // opcode with value 0x90, so we want another 1 byte.
+  // 15 + 1 = 16
+  int NumNops = 16;
+
+  for (int i = 0; i < NumNops; i++) {
     MIBNop = BuildMI(*MBB, MI, DL, TII.get(llvm::X86::NOOP));
   }
 }
