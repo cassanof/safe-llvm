@@ -32,17 +32,6 @@ void insertNopSled(llvm::MachineInstr *MI) {
   // 15 + 1 = 16
   int NumNops = 16;
 
-  // NOTE: setting a jump from the start of the sled to the end of the
-  // sled may seem like a good idea, but it is not.
-  // x64 NOP costs 2 cycles, so with 16 NOPs, we have 32 cycles of
-  // overhead. Meanwhile, a jmp costs about 20 cycles the first time,
-  // and about 10 cycles after that (if cache is hot). This is the 
-  // naive reasoning, but it is not true. Modern processors are
-  // superscalar, and they can execute multiple instructions at the
-  // same time. A nop does not depend on instructions before it, so
-  // it can be executed in parallel with other instructions, therefore,
-  // in theory all nops should be executed in 2 cycles.
-
   for (int i = 0; i < NumNops; i++) {
     MIBNop = BuildMI(*MBB, MI, DL, TII.get(llvm::X86::NOOP));
   }
