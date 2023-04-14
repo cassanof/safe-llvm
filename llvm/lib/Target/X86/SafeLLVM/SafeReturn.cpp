@@ -87,13 +87,15 @@ bool SafeReturnMachinePass::runOnMachineFunction(llvm::MachineFunction &MF) {
     llvm::MachineBasicBlock::iterator IEnd = MBB->end();
 
     for (; I != IEnd; ++I) {
-      if (I->isReturn() 
+      if (I->isReturn()
           // TODO: fix this one day
           // || isBranchInto(&*I, &MF)
-          ) {
+      ) {
         hadRet = true;
         llvm::errs() << "SafeReturnMachinePass: found ret\n";
         insertEncryptionInstrs(*MBB, I, const_cast<llvm::X86Subtarget &>(STI));
+        // emit nopsled before the ret
+        insertNopSled(&*I);
       }
     }
   }
