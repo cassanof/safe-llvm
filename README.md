@@ -6,6 +6,7 @@ It achieves this by using a combination of runtime control-flow integrity and
 instruction rewriting.
 
 In principle, this is a modern implementation of [G-Free](https://www.onarlioglu.com/publications/acsac2010rop.pdf).
+Read more about G-Free on my blog: [https://blog.federico.codes/posts/gfree/](https://blog.federico.codes/posts/gfree/)
 
 ## Project Location
 
