@@ -8,6 +8,7 @@
 #include "llvm/CodeGen/MachineInstr.h"
 #include "llvm/CodeGen/MachineInstrBuilder.h"
 #include "llvm/CodeGen/MachineOperand.h"
+#include "llvm/CodeGen/Register.h"
 #include "llvm/InitializePasses.h"
 #include "llvm/Pass.h"
 
@@ -22,7 +23,7 @@ static llvm::RegisterPass<SafeReturnMachinePass> X("safereturn",
 
 void insertEncryptionInstrs(llvm::MachineBasicBlock &MBB,
                             llvm::MachineBasicBlock::iterator I,
-                            llvm::X86Subtarget &STI) {
+                            const llvm::X86Subtarget &STI) {
   const llvm::X86InstrInfo &TII = *STI.getInstrInfo();
 
   llvm::errs()
@@ -56,13 +57,18 @@ void insertEncryptionInstrs(llvm::MachineBasicBlock &MBB,
   MBB.sortUniqueLiveIns();
 }
 
-void insertEntryEncrypt(llvm::MachineFunction &MF, llvm::X86Subtarget &STI) {
+// TODO: implement RDRAND-based approach, where each function call will get it's
+// unique secret key, instead of relying on the stack canary (a memory read
+// primitive will defeat the current approach)
+void insertEntryEncrypt(llvm::MachineFunction &MF,
+                        const llvm::X86Subtarget &STI) {
   // get the first basic block in the function
   llvm::MachineBasicBlock &MBB = MF.front();
 
   // get the first instruction in the basic block
   llvm::MachineBasicBlock::iterator I = MBB.begin();
 
+  // insert the encryption instructions
   insertEncryptionInstrs(MBB, I, STI);
 }
 
@@ -80,7 +86,8 @@ bool SafeReturnMachinePass::runOnMachineFunction(llvm::MachineFunction &MF) {
   // entry code
   llvm::MachineFunction::iterator MBB = MF.begin();
   llvm::MachineFunction::iterator MBBEnd = MF.end();
-  bool hadRet = false;
+
+  bool HadRet = false;
 
   for (; MBB != MBBEnd; ++MBB) {
     llvm::MachineBasicBlock::iterator I = MBB->begin();
@@ -91,9 +98,9 @@ bool SafeReturnMachinePass::runOnMachineFunction(llvm::MachineFunction &MF) {
           // TODO: fix this one day
           // || isBranchInto(&*I, &MF)
       ) {
-        hadRet = true;
+        HadRet = true;
         llvm::errs() << "SafeReturnMachinePass: found ret\n";
-        insertEncryptionInstrs(*MBB, I, const_cast<llvm::X86Subtarget &>(STI));
+        insertEncryptionInstrs(*MBB, I, STI);
         // emit nopsled before the ret
         insertNopSled(&*I);
       }
@@ -101,8 +108,8 @@ bool SafeReturnMachinePass::runOnMachineFunction(llvm::MachineFunction &MF) {
   }
 
   // only insert the entry code if we had a ret
-  if (hadRet) {
-    insertEntryEncrypt(MF, const_cast<llvm::X86Subtarget &>(STI));
+  if (HadRet) {
+    insertEntryEncrypt(MF, STI);
   }
 
   return true;

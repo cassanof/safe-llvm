@@ -44,17 +44,79 @@ getRegisterEquivalentOpcode(llvm::MachineInstr &MI) {
   case llvm::X86::ADD64ri8:
     return llvm::X86::ADD64rr;
   // ------------------ SUB ------------------
-  // TODO: SUB is not implemented yet
+  case llvm::X86::SUB8ri:
+  case llvm::X86::SUB8ri8:
+    return llvm::X86::SUB8rr;
+  case llvm::X86::SUB16ri:
+  case llvm::X86::SUB16ri8:
+    return llvm::X86::SUB16rr;
+  case llvm::X86::SUB32ri:
+  case llvm::X86::SUB32ri8:
+    return llvm::X86::SUB32rr;
+  case llvm::X86::SUB64ri32:
+  case llvm::X86::SUB64ri8:
+    return llvm::X86::SUB64rr;
   // ------------------ AND ------------------
-  // TODO: AND is not implemented yet
+  case llvm::X86::AND8ri:
+  case llvm::X86::AND8ri8:
+    return llvm::X86::AND8rr;
+  case llvm::X86::AND16ri:
+  case llvm::X86::AND16ri8:
+    return llvm::X86::AND16rr;
+  case llvm::X86::AND32ri:
+  case llvm::X86::AND32ri8:
+    return llvm::X86::AND32rr;
+  case llvm::X86::AND64ri32:
+  case llvm::X86::AND64ri8:
+    return llvm::X86::AND64rr;
   // ------------------ OR ------------------
-  // TODO: OR is not implemented yet
+  case llvm::X86::OR8ri:
+  case llvm::X86::OR8ri8:
+    return llvm::X86::OR8rr;
+  case llvm::X86::OR16ri:
+  case llvm::X86::OR16ri8:
+    return llvm::X86::OR16rr;
+  case llvm::X86::OR32ri:
+  case llvm::X86::OR32ri8:
+    return llvm::X86::OR32rr;
+  case llvm::X86::OR64ri32:
+  case llvm::X86::OR64ri8:
+    return llvm::X86::OR64rr;
   // ------------------ XOR ------------------
-  // TODO: XOR is not implemented yet
+  case llvm::X86::XOR8ri:
+  case llvm::X86::XOR8ri8:
+    return llvm::X86::XOR8rr;
+  case llvm::X86::XOR16ri:
+  case llvm::X86::XOR16ri8:
+    return llvm::X86::XOR16rr;
+  case llvm::X86::XOR32ri:
+  case llvm::X86::XOR32ri8:
+    return llvm::X86::XOR32rr;
+  case llvm::X86::XOR64ri32:
+  case llvm::X86::XOR64ri8:
+    return llvm::X86::XOR64rr;
   // ------------------ CMP ------------------
-  // TODO: CMP is not implemented yet
+  case llvm::X86::CMP8ri:
+  case llvm::X86::CMP8ri8:
+    return llvm::X86::CMP8rr;
+  case llvm::X86::CMP16ri:
+  case llvm::X86::CMP16ri8:
+    return llvm::X86::CMP16rr;
+  case llvm::X86::CMP32ri:
+  case llvm::X86::CMP32ri8:
+    return llvm::X86::CMP32rr;
+  case llvm::X86::CMP64ri32:
+  case llvm::X86::CMP64ri8:
+    return llvm::X86::CMP64rr;
   // ------------------ TEST ------------------
-  // TODO: TEST is not implemented yet
+  case llvm::X86::TEST8ri:
+    return llvm::X86::TEST8rr;
+  case llvm::X86::TEST16ri:
+    return llvm::X86::TEST16rr;
+  case llvm::X86::TEST32ri:
+    return llvm::X86::TEST32rr;
+  case llvm::X86::TEST64ri32:
+    return llvm::X86::TEST64rr;
   // ------------------ MOV ------------------
   case llvm::X86::MOV8ri:
     return llvm::X86::MOV8rr;
