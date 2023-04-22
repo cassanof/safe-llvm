@@ -160,7 +160,7 @@ FunctionPass *createSafeReturnMachinePass();
 /// This pass changes all immediate operands that encode a free-branch instruction
 /// semantically equivalent immediate operands that don't encode a free-branch 
 /// instruction.
-FunctionPass *createImmedateReencodingPass();
+FunctionPass *createImmediateReencodingPass();
 
 /// This pass adds the branch cookie to jmp/call instructions.
 FunctionPass *createBranchCookieMachinePass();

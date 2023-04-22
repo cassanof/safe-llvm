@@ -18,7 +18,7 @@
 #include <optional>
 #include <vector>
 
-llvm::FunctionPass *llvm::createImmedateReencodingPass() {
+llvm::FunctionPass *llvm::createImmediateReencodingPass() {
   return new ImmediateReencodingMachinePass();
 }
 

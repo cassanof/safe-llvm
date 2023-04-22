@@ -537,7 +537,7 @@ void X86PassConfig::addPreRegAlloc() {
   else
     addPass(createX86FastPreTileConfigPass());
 
-  addPass(createImmedateReencodingPass());
+  addPass(createImmediateReencodingPass());
 }
 
 void X86PassConfig::addMachineSSAOptimization() {
