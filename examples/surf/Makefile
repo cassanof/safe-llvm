@@ -3,8 +3,7 @@
 .POSIX:
 
 # set CC to clang in ../../build/bin/clang
-# CC = clang
-CC = ../../build/bin/clang
+CC ?= ../../build/bin/clang
 
 include config.mk
 

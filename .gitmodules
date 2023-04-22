@@ -4,3 +4,15 @@
 [submodule "examples/doom/chocolate-doom"]
 	path = examples/doom/chocolate-doom
 	url = https://github.com/chocolate-doom/chocolate-doom
+[submodule "examples/cJSON"]
+	path = examples/cJSON
+	url = https://github.com/DaveGamble/cJSON
+[submodule "examples/mimalloc"]
+	path = examples/mimalloc
+	url = https://github.com/microsoft/mimalloc
+[submodule "examples/curl"]
+	path = examples/curl
+	url = https://github.com/curl/curl
+[submodule "examples/zlib"]
+	path = examples/zlib
+	url = https://github.com/madler/zlib

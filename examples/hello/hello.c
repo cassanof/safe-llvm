@@ -8,6 +8,9 @@ void hello() {
 }
 
 int main(void) {
-  hello();
+  for (int i = 0; i < 10; i++) {
+    hello();
+  }
+  return EXIT_SUCCESS;
 }
 

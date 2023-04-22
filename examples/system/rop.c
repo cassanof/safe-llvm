@@ -2,16 +2,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-void gadgets(void) { 
+void gadgets(void) {
   __asm__("mov %rax, (%rdx); ret");
   __asm__("pop %rdx; ret");
   __asm__("pop %rax; ret");
   __asm__("pop %rdi; ret");
 }
 
-void vulnerable(char *string) {
-  char buffer[100];
-  memcpy(buffer, string, 400);
+void vulnerable(char *String) {
+  char Buffer[100];
+  memcpy(Buffer, String, 400);
 }
 
 int main(int argc, char **argv) {

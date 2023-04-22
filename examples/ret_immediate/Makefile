@@ -1,4 +1,4 @@
-CC = ../../build/bin/clang
+CC ?= ../../build/bin/clang
 
 all: $(patsubst %.c,%,$(wildcard *.c))
 
