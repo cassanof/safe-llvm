@@ -16,3 +16,6 @@
 [submodule "examples/zlib"]
 	path = examples/zlib
 	url = https://github.com/madler/zlib
+[submodule "examples/littlefs"]
+	path = examples/littlefs
+	url = https://github.com/littlefs-project/littlefs
