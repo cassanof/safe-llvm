@@ -19,3 +19,6 @@
 [submodule "examples/littlefs"]
 	path = examples/littlefs
 	url = https://github.com/littlefs-project/littlefs
+[submodule "examples/compiler-benchmark"]
+	path = examples/compiler-benchmark
+	url = https://github.com/nordlow/compiler-benchmark

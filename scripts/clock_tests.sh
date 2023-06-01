@@ -3,6 +3,9 @@
 # this script runs `make test` $1 times and reports the average time
 # it takes to run the tests, in milliseconds
 
+
+TEST_CMD ?= "make test"
+
 # run the tests $1 times
 AVG=0
 ITERS=$1
@@ -11,7 +14,7 @@ do
     echo "Running test $i of $ITERS"
     # get milliseconds since epoch
     START=$(date +%s%3N)
-    make test
+    $TEST_CMD
     END=$(date +%s%3N)
     # get the difference in milliseconds
     DIFF=$(( $END - $START ))

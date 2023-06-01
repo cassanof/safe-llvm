@@ -23,6 +23,9 @@ fn split_into_two_safe(qword: u64) -> Option<(u64, u64)> {
     let mut right_bad = has_bad_byte(right);
     let mut i = 0;
     while left_bad || right_bad {
+        if (has_bad_byte(left + right)) {
+            println!("left: 0x{left:x}, right: 0x{right:x}");
+        }
         if heuristic == 0 {
             return None;
         } else {
@@ -77,7 +80,7 @@ fn main() {
         if i % 1000000 == 0 {
             println!("fuzzing: {}/{}", i, max);
         }
-        let b = rng.gen_range(0..u64::MAX);
+        let b = rng.gen_range(0..3000000);
         let (left, right) = match split_into_two_safe(b) {
             Some(s) => s,
             None => {

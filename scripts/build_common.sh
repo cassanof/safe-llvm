@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # get by $1 the number of jobs to spawn and by $2 the build type
-if [ $# -eq 2 ]; then
+if [ $# -ne 2 ]; then
   echo "Usage: $0 <number of jobs (more = more speed, too much = crash computer)> <build type. Debug or Release>"
   exit 1
 fi
